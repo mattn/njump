@@ -17,7 +17,7 @@ type NotePageParams struct {
 	GroupLink        string
 }
 
-templ noteInnerBlock(params NotePageParams) {
+templ noteInnerBlock(params NotePageParams, showTranslate bool) {
 	if params.Event.subject != "" {
 		<h1 class="text-2xl" itemprop="headline">{ params.Event.subject }</h1>
 	} else {
@@ -38,10 +38,26 @@ templ noteInnerBlock(params NotePageParams) {
 	if params.Cover != "" {
 		<img src={ params.Cover } alt={ params.Alt } class="mt-1"/>
 	}
+	if showTranslate {
+		<div class="not-prose mb-3">
+			<button
+				type="button"
+				class="njump-translate-btn cursor-pointer"
+				data-label-show="Translate"
+				data-label-hide="Show original"
+				data-label-loading="Translating…"
+				data-label-error="Translation failed"
+				style="font-size:0.8rem;padding:0.15rem 0.6rem;border:1px solid #e32a6d;border-radius:0.375rem;color:#e32a6d;background:transparent;"
+			>Translate</button>
+		</div>
+	}
 	<!-- main content -->
 	<div dir="auto" class="leading-6" itemprop="articleBody">
 		@templ.Raw(params.Content)
 	</div>
+	if showTranslate {
+		<script src={ "/njump/static/translate.js?t=" + compileTimeTs }></script>
+	}
 }
 
 templ noteTemplate(params NotePageParams, isEmbed bool) {
@@ -51,7 +67,7 @@ templ noteTemplate(params NotePageParams, isEmbed bool) {
 			params.Event,
 			params.NeventNaked,
 		) {
-			@noteInnerBlock(params)
+			@noteInnerBlock(params, false)
 		}
 	} else {
 		@eventPageTemplate(
@@ -62,7 +78,7 @@ templ noteTemplate(params NotePageParams, isEmbed bool) {
 			params.Details,
 			params.Event,
 		) {
-			@noteInnerBlock(params)
+			@noteInnerBlock(params, true)
 		}
 	}
 }
