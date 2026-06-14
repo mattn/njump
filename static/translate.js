@@ -1,35 +1,38 @@
 // Translate only the nostr post body (the [itemprop="articleBody"] element)
-// into the visitor's browser language, using Google's free (keyless) endpoint.
-// Self-contained: injects its own styles so no Tailwind rebuild is needed.
+// into the visitor's browser language.
+// The request is proxied through njump's own /njump/translate endpoint, which
+// forwards it to the configured LibreTranslate instance (keeping any API key
+// secret and avoiding CORS). Self-contained: injects its own styles so no
+// Tailwind rebuild is needed.
 (function () {
   var style = document.createElement('style')
   style.textContent =
-    '.njump-translate-btn:hover{background:#e32a6d;color:#fff;}' +
+    '.njump-translate-btn{background:none;border:none;padding:0;cursor:pointer;' +
+    'font:inherit;font-size:0.8rem;color:#a8a29e;text-decoration:underline;' +
+    'text-underline-offset:2px;}' +
+    '.njump-translate-btn:hover{color:#e32a6d;}' +
+    '.njump-translate-btn[disabled]{cursor:default;opacity:0.6;}' +
     '.njump-translation{margin-top:0.75rem;border-left:3px solid #e32a6d;' +
     'padding-left:0.75rem;white-space:pre-wrap;line-height:1.5rem;}'
   document.head.appendChild(style)
 
   function targetLang() {
-    return navigator.language || navigator.userLanguage || 'en'
+    var l = navigator.language || navigator.userLanguage || 'en'
+    return l.split('-')[0].toLowerCase()
   }
 
   function translate(text, target) {
-    var url =
-      'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' +
-      encodeURIComponent(target) +
-      '&dt=t&q=' +
-      encodeURIComponent(text)
-    return fetch(url)
+    return fetch('/njump/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: text, source: 'auto', target: target }),
+    })
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status)
         return r.json()
       })
       .then(function (data) {
-        return ((data && data[0]) || [])
-          .map(function (s) {
-            return s && s[0] ? s[0] : ''
-          })
-          .join('')
+        return (data && data.translatedText) || ''
       })
   }
 
