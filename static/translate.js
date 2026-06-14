@@ -1,9 +1,9 @@
 // Translate only the nostr post body (the [itemprop="articleBody"] element)
 // into the visitor's browser language.
 // The request is proxied through njump's own /njump/translate endpoint, which
-// forwards it to the configured LibreTranslate instance (keeping any API key
-// secret and avoiding CORS). Self-contained: injects its own styles so no
-// Tailwind rebuild is needed.
+// forwards it to the configured translation backend (keeping any API key secret
+// and avoiding CORS). Self-contained: injects its own styles so no Tailwind
+// rebuild is needed.
 (function () {
   var style = document.createElement('style')
   style.textContent =
@@ -25,7 +25,7 @@
     return fetch('/njump/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: text, source: 'auto', target: target }),
+      body: JSON.stringify({ q: text, target: target }),
     })
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status)

@@ -34,6 +34,7 @@ type Settings struct {
 	CacheRetentionDays  int    `envconfig:"CACHE_RETENTION_DAYS" default:"13"`
 	TranslateAPIURL     string `envconfig:"TRANSLATE_API_URL"`
 	TranslateAPIKey     string `envconfig:"TRANSLATE_API_KEY"`
+	TranslateAPIEmail   string `envconfig:"TRANSLATE_API_EMAIL"`
 
 	TrustedPubKeysHex []string `envconfig:"TRUSTED_PUBKEYS"`
 	trustedPubKeys    []nostr.PubKey
