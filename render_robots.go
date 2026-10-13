@@ -31,5 +31,6 @@ Disallow: /
 
 User-agent: *
 Allow: /
+Disallow: /r/
 `)
 }
