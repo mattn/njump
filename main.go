@@ -190,15 +190,15 @@ func main() {
 	sub.HandleFunc("/{$}", renderHomepage)
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// agentBlock(
-		loggingMiddleware(
-			timeoutMiddleware(
-				// queueMiddleware(
-				sub.ServeHTTP,
-				// ),
+		agentBlock(
+			loggingMiddleware(
+				timeoutMiddleware(
+					// queueMiddleware(
+					sub.ServeHTTP,
+					// ),
+				),
 			),
 		)(w, r)
-		// )(w, r)
 	})
 
 	corsH := cors.Default()

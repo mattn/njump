@@ -7,31 +7,24 @@ import (
 
 func agentBlock(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// let them read robots.txt, which tells them to go away for good
+		if r.URL.Path == "/robots.txt" {
+			next.ServeHTTP(w, r)
+			return
+		}
 		ua := r.Header.Get("User-Agent")
+		// only crawlers that robots.txt turns away anyway: they don't all
+		// read it often, and some (meta-webindexer) crawl hard until they do.
+		// words like "Opera" or "Amethyst" would also hit people and clients.
 		for _, bua := range []string{
-			"Opera",
-			"Thinkbot",
-			"meta-webindexer",
-			"node",
-			"Uptime",
-			"Amethyst",
-			"babbar.tech",
-			"semrush",
-			"Bytespider",
-			"AhrefsBot",
-			"DataForSeoBot",
-			"Yandex",
+			"Amazonbot",
+			"SemrushBot",
 			"meta-externalagent",
+			"meta-webindexer",
+			"DataForSeoBot",
 			"DotBot",
-			"ClaudeBot",
-			"GPTBot",
-			"MJ12Bot",
+			"MJ12bot",
 			"PetalBot",
-			"Trident",
-			"BLEXBot",
-			"Aliyun",
-			"Amazon",
-			"Read-Aloud",
 		} {
 			if strings.Contains(ua, bua) {
 				// log.Debug().Str("ua", ua).Msg("user-agent blocked")
