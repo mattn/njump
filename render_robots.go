@@ -17,6 +17,9 @@ Disallow: /
 User-agent: meta-externalagent
 Disallow: /
 
+User-agent: meta-webindexer
+Disallow: /
+
 User-agent: DataForSeoBot
 Disallow: /
 
