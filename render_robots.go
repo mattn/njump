@@ -32,6 +32,9 @@ Disallow: /
 User-agent: PetalBot
 Disallow: /
 
+User-agent: Epochal-Search
+Disallow: /
+
 User-agent: *
 Allow: /
 Disallow: /r/

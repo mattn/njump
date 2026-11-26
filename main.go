@@ -32,6 +32,7 @@ type Settings struct {
 	MediaAlertAPIKey    string `envconfig:"MEDIA_ALERT_API_KEY"`
 	ErrorLogPath        string `envconfig:"ERROR_LOG_PATH" default:"/tmp/njump-errors.jsonl"`
 	CacheRetentionDays  int    `envconfig:"CACHE_RETENTION_DAYS" default:"13"`
+	CacheMaxEvents      int    `envconfig:"CACHE_MAX_EVENTS" default:"500000"`
 	LaraAccessKeyID     string `envconfig:"LARA_ACCESS_KEY_ID"`
 	LaraAccessKeySecret string `envconfig:"LARA_ACCESS_KEY_SECRET"`
 
@@ -77,6 +78,9 @@ func main() {
 
 	if s.CacheRetentionDays < 1 {
 		log.Fatal().Int("value", s.CacheRetentionDays).Msg("CACHE_RETENTION_DAYS must be a positive integer")
+	}
+	if s.CacheMaxEvents < 0 {
+		log.Fatal().Int("value", s.CacheMaxEvents).Msg("CACHE_MAX_EVENTS must not be negative")
 	}
 
 	// eventstore and nostr system
@@ -152,7 +156,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go updateArchives(ctx)
-	go deleteOldCachedEvents(ctx, s.CacheRetentionDays)
+	go deleteOldCachedEvents(ctx, s.CacheRetentionDays, s.CacheMaxEvents)
 	go outboxHintsFileLoaderSaver(ctx)
 
 	// expose our internal cache as a relay (mostly for debugging purposes)
